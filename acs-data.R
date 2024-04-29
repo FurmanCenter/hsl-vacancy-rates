@@ -21,9 +21,33 @@
 #   to start. Eventually, though, the data will be pulled using the
 #   tidycensus package to more easily update this analysis in the future.
 #   https://docs.google.com/document/d/1NEdTzGqZns5OQQMBMvk4qRK73WzihDkRBYgJ6LJtkqI/edit#heading=h.ahnz5pws0xur
-#   
+# 
+# Reading in "Vacancy Rates Comparison"
+install.packages("tidycensus")
+install.packages("readxl")
+vacancy_rates_1year <- na.omit(read_excel("C:/Users/nbc9285/Documents/GitHub/hsl-vacancy-rates/Data/Vacancy Rates Comparison.xlsx", sheet = 1))
+vacancy_rates_5year <- read_excel("C:/Users/nbc9285/Documents/GitHub/hsl-vacancy-rates/Data/Vacancy Rates Comparison.xlsx", sheet = 2)
 #   4) Generate line graphs
 # 
+# Figure 1. Roanoke Rental Vacancy Rates, 2017-2022
+library(ggplot2)
+vacancy_rates_5year_20172022 <- data.frame(
+  Span = c("5-year, 5-year") ,
+  Year = c(2017, 2022) ,
+  Rate = c(0.081, 0.090) , 
+  Margin_error = c(0.015, 0.017),
+  Lower_bound = c(0.066, 0.073) ,
+  Upper_bound = c(0.096, 0.107)
+)
+
+ggplot(vacancy_rates_5year_20172022, aes(x = Year, y = Rate)) +
+  geom_line() +
+  ylim(0, 0.12)+ 
+  scale_y_continuous(labels = scales::percent)
+
+# Figure 2. Roanoke Rental Vacancy Rates, 2013-2022
+ggplot(vacancy_rates_1year, aes(x = Year, y = Rate, group = 1)) +
+    geom_line()
 #   5) Incorporate margins of error into the graphs
 # 
 #   6) Add theme_hsl_base to the plots!

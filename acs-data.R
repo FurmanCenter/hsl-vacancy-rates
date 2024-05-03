@@ -85,10 +85,10 @@ ggplot(vacancy_rates_5year_20172022, aes(x = Year, y = Rate)) +
                      limits = c(0, .12),
                      expand = c(0,0)) +
   scale_x_continuous(breaks = c(2017, 2022)) +
-  labs(title = "Five-Year Rental Vacancy Rate\nRoanoke, Virginia (2017-2022)",
+  labs(title = "American Community Survey Five-Year Rental Vacancy Rate\nRoanoke, Virginia (2017-2022)",
        y = "",
        x = "",
-       caption = "Source: American Community Survey 5-year estimates (2017-2022)") +
+       caption = "Source: American Community Survey 5-year (2017-2022)") +
   theme_hsl_base(base_family = "Graphik") +
   theme(axis.text.y = element_text(hjust = -0.5,
                                    size = 12),
@@ -126,10 +126,10 @@ vac_1_year_filtered %>%
                      limits = c(0, .16),
                      expand = c(0,0)) +
   scale_x_continuous(breaks = vacancy_rates_1year$Year) +
-    labs(title = "One-Year Rental Vacancy Rate\nRoanoke, Virginia (2013-2022)",
+    labs(title = "American Community Survey One-Year Rental Vacancy Rate\nRoanoke, Virginia (2013-2022)",
          y = "",
          x = "",
-         caption = "Source: American Community Survey 1-year estimates (2013-2022)") +
+         caption = "Source: American Community Survey 1-year (2013-2022)") +
     theme_hsl_base(base_family = "Graphik") +
     theme(axis.text.y = element_text(hjust = -0.05,
                                      size = 12),

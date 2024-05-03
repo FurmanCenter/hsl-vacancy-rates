@@ -18,10 +18,24 @@
 #   Be sure to download the Lab Graphik font!
 
 library(fcthemes)
-install.packages(c("extrafont")) 
+# install.packages(c("extrafont")) 
 library(extrafont) 
 extrafont::font_import(pattern = 'Graphik')
 extrafont::loadfonts()
+library(dplyr)
+
+install.packages("showtext", "sysfonts")
+library(sysfonts)
+library(showtext)
+font_add(family = "National", 
+         regular = "National-Regular.ttf",
+         italic = "National-LightItalic.ttf",
+         bold = "National-Bold.ttf")
+font_add(family = "Graphik", 
+         regular = "Graphik-Regular.ttf",
+         italic = "Graphik-LightItalic.ttf",
+         bold = "Graphik-Bold.ttf")
+
 
 #     
 #   3) Read in the data. You can read the .xlsx file in the /Data folder
@@ -30,10 +44,10 @@ extrafont::loadfonts()
 #   https://docs.google.com/document/d/1NEdTzGqZns5OQQMBMvk4qRK73WzihDkRBYgJ6LJtkqI/edit#heading=h.ahnz5pws0xur
 # 
 # Reading in "Vacancy Rates Comparison
-install.packages("readxl")
+# install.packages("readxl")
 library(readxl)
-vacancy_rates_1year <- na.omit(read_excel("C:/Users/nbc9285/Documents/GitHub/hsl-vacancy-rates/Data/Vacancy Rates Comparison.xlsx", sheet = 1))
-vacancy_rates_5year <- read_excel("C:/Users/nbc9285/Documents/GitHub/hsl-vacancy-rates/Data/Vacancy Rates Comparison.xlsx", sheet = 2)
+vacancy_rates_1year <- na.omit(read_excel("Data/Vacancy Rates Comparison.xlsx", sheet = 1))
+vacancy_rates_5year <- read_excel("Data/Vacancy Rates Comparison.xlsx", sheet = 2)
 
 #   4) Generate line graphs
 # 
@@ -49,49 +63,82 @@ vacancy_rates_5year_20172022 <- data.frame(
   Upper_bound = c(0.096, 0.107)
 )
 
-ggplot(vacancy_rates_5year_20172022, aes(x = Year, y = Rate)) +
-  geom_line() +
-  ylim(0, 0.12)
+plot_save_include <- function(filename, p = ggplot2::last_plot(), height = 6, width = 10) {
+  ggplot2::ggsave(filename, height = height, width = width, dpi = 72)
+  knitr::include_graphics(filename)
+}
 
-
-# Figure 2. Roanoke Rental Vacancy Rates, 2013-2022
-ggplot(vacancy_rates_1year, aes(x = Year, y = Rate, group = 1)) +
-    geom_line()
-#   5) Incorporate margins of error into the graphs
-# 
-# Figure 1. Roanoke Rental Vacancy Rates, 2017-2022
-ggplot(vacancy_rates_5year_20172022, aes(x = Year, y = Rate)) +
-  geom_line() +
-  ylim(0, 0.12) + 
-  geom_point() +
-  geom_errorbar(ymin = vacancy_rates_5year_20172022$Lower_bound, ymax = vacancy_rates_5year_20172022$Upper_bound, width=1)
-
-# Figure 2. Roanoke Rental Vacancy Rates, 2013-2022
-ggplot(vacancy_rates_1year, aes(x = Year, y = Rate, group = 1)) +
-  geom_line() +
-  geom_point() +
-  geom_errorbar(aes(ymin = `Lower bound`, ymax = `Upper bound`), width=1) 
 
 #   6) Add theme_hsl_base to the plots!
-# Figure 1. Roanoke Rental Vacancy Rates, 2017-2022
+# Figure 1. 5 year vacancy rates, 2017-2022
 ggplot(vacancy_rates_5year_20172022, aes(x = Year, y = Rate)) +
-  geom_line()  + 
-  geom_point() +
-  geom_errorbar(ymin = vacancy_rates_5year_20172022$Lower_bound, ymax = vacancy_rates_5year_20172022$Upper_bound, width=1) + 
-  theme_hsl_base()+ 
-  ylim(0, 0.12) +
-  ylab("Rental Vacancy Rate") + 
-  ggtitle("Roanoke Rental Vacancy Rates, ACS 5-year  estimates (2012-2016 to 2017-2021)")
+  geom_line(size = 1.25,
+            color = "#1F687E")  + 
+  geom_point(color = "#1F687E",
+             size = 3) +
+  geom_errorbar(ymin = vacancy_rates_5year_20172022$Lower_bound,
+                ymax = vacancy_rates_5year_20172022$Upper_bound,
+                width = 0.1,
+                size = 1.25,
+                color = "#1F687E") + 
+  scale_y_continuous(labels = scales::percent,
+                     limits = c(0, .12),
+                     expand = c(0,0)) +
+  scale_x_continuous(breaks = c(2017, 2022)) +
+  labs(title = "Five-Year Rental Vacancy Rate\nRoanoke, Virginia (2017-2022)",
+       y = "",
+       x = "",
+       caption = "Source: American Community Survey 5-year estimates (2017-2022)") +
+  theme_hsl_base(base_family = "Graphik") +
+  theme(axis.text.y = element_text(hjust = -0.5,
+                                   size = 12),
+        axis.text.x = element_text(vjust = -5,
+                                   size = 12),
+        plot.title = element_text(vjust = 5,
+                                  lineheight = 1.4))
 
+plot_save_include('vacancy_fig_1.png')
 
-# Figure 2. Roanoke Rental Vacancy Rates, 2013-2022
-ggplot(vacancy_rates_1year, aes(x = Year, y = as.numeric(Rate), group = 1)) +
-  geom_line() +
-  geom_point() +
-  geom_errorbar(aes(ymin = `Lower bound`, ymax = `Upper bound`, width=0.5)) + 
+# Figure 2. 1 year vacancy rates, 2013-2022
+vacancy_rates_1year <- vacancy_rates_1year %>%
+  filter(Year >= 2013) %>%
+  add_row(Span = "1-year", Year = 2020) %>%
+  arrange(Year)
+
+vac_1_year_filtered <- vacancy_rates_1year %>%
+  filter(Year != 2020)
+
+vac_1_year_filtered %>%
+  ggplot(aes(x = Year, y = as.numeric(Rate),
+             group = 1)) +
+  geom_line(size = 1.25,
+            color = "#1F687E",
+            na.rm = TRUE)  + 
+  geom_point(color = "#1F687E",
+             size = 3) +
+  geom_errorbar(ymin = vac_1_year_filtered$`Lower bound`,
+                ymax = vac_1_year_filtered$`Upper bound`,
+                width = 0.2,
+                size = 1.25,
+                color = "#1F687E") + 
   theme_hsl_base()+ 
-  scale_y_continuous(labels = scales::percent) +
-  ylab("Rental Vacancy Rate") +
-  ggtitle ("Roanoke Rental Vacancy Rates, ACS 1-year  estimates (2013 - 2021)")
+  scale_y_continuous(labels = scales::percent,
+                     limits = c(0, .16),
+                     expand = c(0,0)) +
+  scale_x_continuous(breaks = vacancy_rates_1year$Year) +
+    labs(title = "One-Year Rental Vacancy Rate\nRoanoke, Virginia (2013-2022)",
+         y = "",
+         x = "",
+         caption = "Source: American Community Survey 1-year estimates (2013-2022)") +
+    theme_hsl_base(base_family = "Graphik") +
+    theme(axis.text.y = element_text(hjust = -0.05,
+                                     size = 12),
+          axis.text.x = element_text(vjust = -0.1,
+                                     size = 12,
+                                     angle = 30),
+          plot.title = element_text(vjust = 5,
+                                    lineheight = 1.4))
+
+plot_save_include('vacancy_fig_2.png')
 
 #   7) Troubleshoot anything that looks bad

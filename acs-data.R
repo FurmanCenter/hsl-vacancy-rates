@@ -24,17 +24,17 @@ extrafont::font_import(pattern = 'Graphik')
 extrafont::loadfonts()
 library(dplyr)
 
-install.packages("showtext", "sysfonts")
-library(sysfonts)
-library(showtext)
-font_add(family = "National", 
-         regular = "National-Regular.ttf",
-         italic = "National-LightItalic.ttf",
-         bold = "National-Bold.ttf")
-font_add(family = "Graphik", 
-         regular = "Graphik-Regular.ttf",
-         italic = "Graphik-LightItalic.ttf",
-         bold = "Graphik-Bold.ttf")
+# install.packages("showtext", "sysfonts")
+# library(sysfonts)
+# library(showtext)
+# font_add(family = "National", 
+#          regular = "National-Regular.ttf",
+#          italic = "National-LightItalic.ttf",
+#          bold = "National-Bold.ttf")
+# font_add(family = "Graphik", 
+#          regular = "Graphik-Regular.ttf",
+#          italic = "Graphik-LightItalic.ttf",
+#          bold = "Graphik-Bold.ttf")
 
 
 #     
